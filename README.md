@@ -131,3 +131,80 @@ Neste tópico, avaliaremos a organização do histórico de mudanças e a transp
 ## Development & License
 Consulte `development.md` para instruções de setup local.
 License: MIT.
+
+---
+
+## 📊 Banco de Dados - Times e Usuários
+
+### Tabelas Criadas
+
+Foi implementado um sistema completo de gerenciamento de times e usuários com regras de negócio robustas:
+
+#### Tabela `times`
+- `id_time` (INTEGER, PK) - Identificador único do time
+- `nome_time` (VARCHAR(100), UNIQUE) - Nome do time
+- `responsabilidades` (VARCHAR(500)) - Descrição das responsabilidades
+- `cpf_lider` (VARCHAR(11), FK, UNIQUE, NOT NULL) - CPF do líder
+
+#### Tabela `users`
+- `cpf_user` (VARCHAR(11), PK) - CPF do usuário
+- `nome` (VARCHAR(100)) - Nome do usuário
+- `funcao` (VARCHAR(100)) - Função/cargo do usuário
+- `id_time` (INTEGER, FK) - Referência para o time (opcional)
+
+### 🔒 Regras de Negócio Implementadas
+
+1. **Todo time DEVE ter um líder** (campo obrigatório)
+2. **Um usuário só pode ser líder de UM time** (constraint UNIQUE)
+3. **Usuários só podem pertencer a UM time por vez**
+4. **Não é possível deletar um líder** (validado pela API)
+5. **Líderes não podem sair do time** (validado pela API)
+
+### APIs Disponíveis
+
+**Times:**
+- `POST /api/v1/times/` - Criar time (requer cpf_lider)
+- `GET /api/v1/times/` - Listar times (com líder e total de membros)
+- `GET /api/v1/times/{id}` - Obter time específico
+- `PUT /api/v1/times/{id}` - Atualizar time (pode trocar líder)
+- `DELETE /api/v1/times/{id}` - Deletar time
+- `GET /api/v1/times/{id}/membros` - Listar membros (indica líder)
+
+**Usuários:**
+- `POST /api/v1/users/` - Criar usuário
+- `GET /api/v1/users/` - Listar usuários (com time e se é líder)
+- `GET /api/v1/users/{cpf}` - Obter usuário específico
+- `PUT /api/v1/users/{cpf}` - Atualizar usuário
+- `DELETE /api/v1/users/{cpf}` - Deletar usuário
+- `GET /api/v1/users/lideres/lista` - Listar apenas líderes
+
+### Documentação Completa
+
+- **[TABELAS.md](TABELAS.md)** - Guia completo com estrutura, regras e comandos
+- **[EXEMPLOS_API.md](EXEMPLOS_API.md)** - Exemplos práticos com curl, Python e HTTPie
+
+### Quick Start
+
+```bash
+# 1. Iniciar ambiente
+make dev-up
+
+# 2. Criar migração
+make db-new-migration MESSAGE="Criar tabelas times e users com líder"
+
+# 3. Aplicar migração
+make db-upgrade
+
+# 4. Popular com dados de teste
+make backend-shell
+python scripts/seed_data.py
+
+# 5. Testar API
+curl http://localhost:8000/docs
+```
+
+### 📝 Ordem Correta de Criação
+
+1. **Criar USUÁRIOS primeiro** (pois times precisam de líderes existentes)
+2. **Criar TIMES** (informando o CPF de um líder existente)
+3. **Atribuir MEMBROS aos times** (atualizando usuários com id_time)
