@@ -10,13 +10,15 @@ const Header: React.FC = () => {
             <span className="logo-icon">⚔️</span>
             <div className="logo-text-group">
               <span className="logo-title">Interest</span>
-              <span className="logo-subtitle">Desafio Técnico</span>
+              <span className="logo-subtitle">Gestão de Equipes</span>
             </div>
           </div>
         </Link>
         
         <nav className="header-nav">
-          <Link to="/" className="nav-link">Quests</Link>
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/manage" className="nav-link">Usuários</Link>
+          <Link to="/teams" className="nav-link">Equipes</Link>
           <a href="https://github.com/Joao-Marinho-Interest/Seletiva-Interest-Dev-2025" target="_blank" rel="noopener noreferrer" className="nav-link">
             GitHub
           </a>

@@ -3,6 +3,9 @@ import { QuestProvider } from './hooks/useQuestContext'
 import MainLayout from './layouts/MainLayout'
 import LandingPage from './pages/LandingPage'
 import QuestPage from './pages/QuestPage'
+import ManagementPage from './pages/ManagementPage'
+import TeamsPage from './pages/TeamsPage'
+import TeamDetailPage from './pages/TeamDetailPage'
 import './App.css'
 
 function App() {
@@ -13,6 +16,9 @@ function App() {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<LandingPage />} />
             <Route path="quest/:id" element={<QuestPage />} />
+            <Route path="manage" element={<ManagementPage />} />
+            <Route path="teams" element={<TeamsPage />} />
+            <Route path="team/:id" element={<TeamDetailPage />} />
           </Route>
         </Routes>
       </Router>
