@@ -12,6 +12,11 @@ services:
 
   prestart:
     # Ensure prestart runs on the same network so it can reach the DB by hostname
+    volumes:
+      - ./backend:/app
+      - /app/.venv  # Prevent host .venv from overwriting container's
+    env_file:
+      - .env
 
   backend:
     restart: "no"

@@ -14,8 +14,8 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
     
     cpf_user: str = Field(primary_key=True, max_length=11)
-    nome: str = Field(max_length=100, nullable=False)
-    funcao: str = Field(max_length=100, nullable=False)
+    nome: str = Field(max_length=100)
+    funcao: str = Field(max_length=100)
     id_time: Optional[int] = Field(default=None, foreign_key="times.id_time")
     
     # Relacionamento com time
@@ -41,13 +41,12 @@ class Time(SQLModel, table=True):
     __tablename__ = "times"
     
     id_time: int = Field(primary_key=True)
-    nome_time: str = Field(max_length=100, nullable=False, unique=True)
-    responsabilidades: str = Field(max_length=500, nullable=True)
+    nome_time: str = Field(max_length=100, unique=True)
+    responsabilidades: Optional[str] = Field(default=None, max_length=500)
     
     # CPF do líder - OBRIGATÓRIO
     cpf_lider: str = Field(
         foreign_key="users.cpf_user",
-        nullable=False,
         unique=True,  # Garante que um usuário só pode ser líder de um time
         max_length=11
     )
