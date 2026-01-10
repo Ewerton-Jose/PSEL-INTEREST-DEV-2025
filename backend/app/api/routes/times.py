@@ -16,7 +16,7 @@ def get_session():
 
 class TimeCreate(BaseModel):
     """Schema para criação de time"""
-    id_time: int
+    id_time: int | None = None
     nome_time: str
     responsabilidades: str | None = None
     cpf_lider: str
@@ -49,10 +49,16 @@ def criar_time(time_data: TimeCreate, session: Session = Depends(get_session)):
     - O líder deve ser um usuário existente
     - Um usuário só pode ser líder de um time
     """
-    # Verifica se já existe time com esse ID
-    existing = session.get(Time, time_data.id_time)
-    if existing:
-        raise HTTPException(status_code=400, detail="Time com este ID já existe")
+    # Auto-gera ID se não fornecido
+    if time_data.id_time is None:
+        statement = select(Time).order_by(Time.id_time.desc())
+        last_time = session.exec(statement).first()
+        time_data.id_time = (last_time.id_time + 1) if last_time else 1
+    else:
+        # Verifica se já existe time com esse ID
+        existing = session.get(Time, time_data.id_time)
+        if existing:
+            raise HTTPException(status_code=400, detail="Time com este ID já existe")
     
     # Verifica se já existe time com esse nome
     statement = select(Time).where(Time.nome_time == time_data.nome_time)

@@ -51,7 +51,7 @@ export const deleteUser = (cpf: string) => request<void>(`/users/${cpf}`, { meth
 export const listTimes = () => request<Time[]>("/times/")
 export const getTeam = (id: number) => request<Time>(`/times/${id}`)
 export const listTeamMembers = (id: number) => request<User[]>(`/times/${id}/membros`)
-export const createTime = (payload: Time) =>
+export const createTime = (payload: Omit<Time, "id_time">) =>
   request<Time>("/times/", { method: "POST", headers: jsonHeaders, body: JSON.stringify(payload) })
 export const updateTime = (id: number, payload: Omit<Time, "id_time">) =>
   request<Time>(`/times/${id}`, { method: "PUT", headers: jsonHeaders, body: JSON.stringify(payload) })

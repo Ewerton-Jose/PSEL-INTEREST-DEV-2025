@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { TrashIcon, PencilIcon } from '../components/Icons'
 import {
   User,
   listUsers,
@@ -163,8 +164,12 @@ const ManagementPage: React.FC = () => {
                   <div className="muted">Time: {user.nome_time || '—'} {user.is_lider ? '(Líder)' : ''}</div>
                 </div>
                 <div className="actions">
-                  <button onClick={() => handleEditUser(user)}>Editar</button>
-                  <button className="danger" onClick={() => handleDeleteUser(user.cpf_user)}>Excluir</button>
+                  <button aria-label="Editar" title="Editar" onClick={() => handleEditUser(user)}>
+                    <PencilIcon />
+                  </button>
+                  <button className="danger" aria-label="Excluir" title="Excluir" onClick={() => handleDeleteUser(user.cpf_user)}>
+                    <TrashIcon />
+                  </button>
                 </div>
               </div>
             ))}

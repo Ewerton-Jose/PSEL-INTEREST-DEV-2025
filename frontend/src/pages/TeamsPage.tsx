@@ -30,7 +30,7 @@ const TeamsPage: React.FC = () => {
           <h1>Equipes</h1>
           <p>Visualize e gerencie todas as equipes do sistema</p>
         </div>
-        <button className="primary" onClick={() => navigate('/manage')}>
+        <button className="primary" onClick={() => navigate('/teams/new')}>
           + Novo Time
         </button>
         {loading && <span className="badge">Atualizando...</span>}

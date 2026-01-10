@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { User, Time, getTeam, listTeamMembers, listUsers, updateUser } from '../services/api'
+import { User, Time, getTeam, listTeamMembers, listUsers, updateUser, updateTime, deleteTime } from '../services/api'
 
 interface Toast {
   type: 'success' | 'error'
@@ -17,6 +17,9 @@ const TeamDetailPage: React.FC = () => {
   const [availableUsers, setAvailableUsers] = useState<User[]>([])
   const [selectedUser, setSelectedUser] = useState<string>('')
   const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editForm, setEditForm] = useState<{ nome_time: string; responsabilidades: string | null; cpf_lider: string } | null>(null)
   const [toast, setToast] = useState<Toast | null>(null)
 
   const loadData = async () => {
@@ -40,6 +43,16 @@ const TeamDetailPage: React.FC = () => {
   useEffect(() => {
     loadData()
   }, [teamId])
+
+  useEffect(() => {
+    if (team) {
+      setEditForm({
+        nome_time: team.nome_time,
+        responsabilidades: team.responsabilidades || '',
+        cpf_lider: team.cpf_lider,
+      })
+    }
+  }, [team])
 
   const handleAddMember = async () => {
     if (!selectedUser) return
@@ -74,6 +87,38 @@ const TeamDetailPage: React.FC = () => {
     }
   }
 
+  const handleUpdateTeam = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editForm || !team) return
+    setSaving(true)
+    try {
+      const updated = await updateTime(teamId, {
+        nome_time: editForm.nome_time,
+        responsabilidades: editForm.responsabilidades || null,
+        cpf_lider: editForm.cpf_lider,
+      })
+      setTeam(updated)
+      setToast({ type: 'success', message: 'Time atualizado com sucesso' })
+      setEditMode(false)
+      loadData()
+    } catch (err) {
+      setToast({ type: 'error', message: (err as Error).message })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteTeam = async () => {
+    if (!confirm('Deseja realmente excluir este time?')) return
+    try {
+      await deleteTime(teamId)
+      setToast({ type: 'success', message: 'Time excluído' })
+      navigate('/teams')
+    } catch (err) {
+      setToast({ type: 'error', message: (err as Error).message })
+    }
+  }
+
   const handleClearToast = () => setToast(null)
 
   if (!team) {
@@ -90,9 +135,17 @@ const TeamDetailPage: React.FC = () => {
         <button className="back-btn" onClick={() => navigate('/teams')}>
           ← Voltar
         </button>
-        <div>
-          <h1>{team.nome_time}</h1>
-          <p>ID: {team.id_time}</p>
+        <div className="detail-actions">
+          <div>
+            <h1>{team.nome_time}</h1>
+            <p>ID: {team.id_time}</p>
+          </div>
+          <div className="actions">
+            <button className="ghost" onClick={() => setEditMode(prev => !prev)}>
+              {editMode ? 'Cancelar edição' : 'Editar time'}
+            </button>
+            <button className="danger" onClick={handleDeleteTeam}>Excluir time</button>
+          </div>
         </div>
       </div>
 
@@ -123,6 +176,49 @@ const TeamDetailPage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* Editar Time */}
+        {editMode && editForm && (
+          <section className="card">
+            <h2>Editar Time</h2>
+            <form className="form" onSubmit={handleUpdateTeam}>
+              <label>
+                Nome do Time
+                <input
+                  value={editForm.nome_time}
+                  onChange={e => setEditForm(prev => prev ? { ...prev, nome_time: e.target.value } : prev)}
+                  required
+                />
+              </label>
+              <label>
+                Responsabilidades (opcional)
+                <textarea
+                  value={editForm.responsabilidades ?? ''}
+                  onChange={e => setEditForm(prev => prev ? { ...prev, responsabilidades: e.target.value } : prev)}
+                />
+              </label>
+              <label>
+                Líder (CPF)
+                <select
+                  value={editForm.cpf_lider}
+                  onChange={e => setEditForm(prev => prev ? { ...prev, cpf_lider: e.target.value } : prev)}
+                  required
+                >
+                  <option value="">-- Selecione --</option>
+                  {members.concat(availableUsers).map(user => (
+                    <option key={user.cpf_user} value={user.cpf_user}>
+                      {user.nome} ({user.cpf_user})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="actions">
+                <button type="button" className="ghost" onClick={() => setEditMode(false)}>Cancelar</button>
+                <button type="submit" className="primary" disabled={saving}>Salvar</button>
+              </div>
+            </form>
+          </section>
+        )}
 
         {/* Adicionar Membro */}
         <section className="card">
