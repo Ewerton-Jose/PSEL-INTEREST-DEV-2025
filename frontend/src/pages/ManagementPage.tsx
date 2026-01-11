@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { TrashIcon, PencilIcon } from '../components/Icons'
+import { formatCPF, removeCPFMask } from '../utils/cpfMask'
 import {
   User,
   listUsers,
   createUser,
   updateUser,
   deleteUser,
+  listTimes,
+  Time,
 } from '../services/api'
 
 interface Toast {
@@ -17,6 +20,7 @@ const emptyUser: User = { cpf_user: '', nome: '', funcao: '', id_time: null }
 
 const ManagementPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([])
+  const [times, setTimes] = useState<Time[]>([])
   const [userForm, setUserForm] = useState<User>(emptyUser)
   const [editingUser, setEditingUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -26,8 +30,12 @@ const ManagementPage: React.FC = () => {
   const loadUsers = async () => {
     setLoading(true)
     try {
-      const data = await listUsers()
-      setUsers(data)
+      const [usersData, timesData] = await Promise.all([
+        listUsers(),
+        listTimes(),
+      ])
+      setUsers(usersData)
+      setTimes(timesData)
     } catch (err) {
       setToast({ type: 'error', message: (err as Error).message })
     } finally {
@@ -45,6 +53,15 @@ const ManagementPage: React.FC = () => {
       setValidationError('Sem números em nome')
       return
     }
+    const cleanCPF = removeCPFMask(userForm.cpf_user)
+    if (!editingUser && cleanCPF.length !== 11) {
+      setValidationError('CPF deve ter exatamente 11 dígitos')
+      return
+    }
+    if (!editingUser && !/^\d+$/.test(cleanCPF)) {
+      setValidationError('CPF deve conter apenas números')
+      return
+    }
     try {
       if (editingUser) {
         const updated = await updateUser(editingUser, {
@@ -56,7 +73,7 @@ const ManagementPage: React.FC = () => {
         setToast({ type: 'success', message: 'Usuário atualizado' })
       } else {
         const created = await createUser({
-          cpf_user: userForm.cpf_user,
+          cpf_user: cleanCPF,
           nome: userForm.nome,
           funcao: userForm.funcao,
           id_time: userForm.id_time,
@@ -124,12 +141,17 @@ const ManagementPage: React.FC = () => {
               <label>
                 <div className="field-header">
                   <span>CPF</span>
-                  <span className="field-hint">Obrigatório</span>
+                  <span className="field-hint">Obrigatório (11 dígitos)</span>
                 </div>
                 <input
                   value={userForm.cpf_user}
-                  onChange={e => setUserForm(prev => ({ ...prev, cpf_user: e.target.value }))}
-                  placeholder="00000000000"
+                  onChange={e => {
+                    setValidationError(null)
+                    const formatted = formatCPF(e.target.value)
+                    setUserForm(prev => ({ ...prev, cpf_user: formatted }))
+                  }}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
                   required
                 />
               </label>
@@ -158,13 +180,21 @@ const ManagementPage: React.FC = () => {
               />
             </label>
             <label>
-              Time (ID) opcional
-              <input
-                type="number"
+              <div className="field-header">
+                <span>Time</span>
+                <span className="field-hint">Opcional</span>
+              </div>
+              <select
                 value={userForm.id_time ?? ''}
                 onChange={e => setUserForm(prev => ({ ...prev, id_time: e.target.value ? Number(e.target.value) : null }))}
-                placeholder="ex: 1"
-              />
+              >
+                <option value="">-- Nenhum --</option>
+                {times.map(time => (
+                  <option key={time.id_time} value={time.id_time}>
+                    {time.nome_time}
+                  </option>
+                ))}
+              </select>
             </label>
             <button type="submit" className="primary" disabled={loading}>
               {editingUser ? 'Salvar alterações' : 'Criar usuário'}
@@ -176,7 +206,7 @@ const ManagementPage: React.FC = () => {
               <div key={user.cpf_user} className="list-row">
                 <div>
                   <strong>{user.nome}</strong>
-                  <div className="muted">CPF: {user.cpf_user} · {user.funcao}</div>
+                  <div className="muted">CPF: {formatCPF(user.cpf_user)} · {user.funcao}</div>
                   <div className="muted">Time: {user.nome_time || '—'} {user.is_lider ? '(Líder)' : ''}</div>
                 </div>
                 <div className="actions">

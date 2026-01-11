@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { formatCPF } from '../utils/cpfMask'
 import { listTimes, Time } from '../services/api'
 
 const TeamsPage: React.FC = () => {
@@ -58,7 +59,7 @@ const TeamsPage: React.FC = () => {
               <div className="team-details">
                 <div className="detail-row">
                   <span className="label">Líder:</span>
-                  <span className="value">{time.lider_nome || time.cpf_lider}</span>
+                  <span className="value">{time.lider_nome || formatCPF(time.cpf_lider)}</span>
                 </div>
                 <div className="detail-row">
                   <span className="label">Membros:</span>

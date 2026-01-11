@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { formatCPF } from '../utils/cpfMask'
 import { User, Time, getTeam, listTeamMembers, listUsers, updateUser, updateTime, deleteTime } from '../services/api'
 
 interface Toast {
@@ -162,7 +163,7 @@ const TeamDetailPage: React.FC = () => {
           <div className="info-block">
             <div className="info-item">
               <label>Líder</label>
-              <p className="value">{team.lider_nome || team.cpf_lider}</p>
+              <p className="value">{team.lider_nome || formatCPF(team.cpf_lider)}</p>
             </div>
             {team.responsabilidades && (
               <div className="info-item">
@@ -207,7 +208,7 @@ const TeamDetailPage: React.FC = () => {
                   <option value="">-- Selecione --</option>
                   {members.concat(availableUsers).map(user => (
                     <option key={user.cpf_user} value={user.cpf_user}>
-                      {user.nome} ({user.cpf_user})
+                      {user.nome} ({formatCPF(user.cpf_user)})
                     </option>
                   ))}
                 </select>
@@ -236,7 +237,7 @@ const TeamDetailPage: React.FC = () => {
                   <option value="">-- Selecione --</option>
                   {availableUsers.map(user => (
                     <option key={user.cpf_user} value={user.cpf_user}>
-                      {user.nome} ({user.cpf_user})
+                      {user.nome} ({formatCPF(user.cpf_user)})
                     </option>
                   ))}
                 </select>
@@ -265,7 +266,7 @@ const TeamDetailPage: React.FC = () => {
                 <div className="member-info">
                   <h4>{member.nome}</h4>
                   <div className="member-meta">
-                    <span className="cpf">CPF: {member.cpf_user}</span>
+                    <span className="cpf">CPF: {formatCPF(member.cpf_user)}</span>
                     <span className="funcao">{member.funcao}</span>
                     {member.is_lider && <span className="badge-leader">Líder</span>}
                   </div>

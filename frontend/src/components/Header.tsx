@@ -7,7 +7,7 @@ const Header: React.FC = () => {
       <div className="header-content">
         <Link to="/" className="logo-link">
           <div className="logo-compact">
-            <span className="logo-icon">⚔️</span>
+            <img src="https://media.glassdoor.com/sqll/2614699/interest-engenharia-squarelogo-1645099511175.png" alt="Interest" className="logo-icon-img" />
             <div className="logo-text-group">
               <span className="logo-title">Interest</span>
               <span className="logo-subtitle">Gestão de Equipes</span>

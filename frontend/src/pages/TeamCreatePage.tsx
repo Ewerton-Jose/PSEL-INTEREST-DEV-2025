@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createTime, Time, listUsers, User } from '../services/api'
+import { formatCPF } from '../utils/cpfMask'
 import { useEffect } from 'react'
 
 interface Toast {
@@ -31,6 +32,10 @@ const TeamCreatePage: React.FC = () => {
     e.preventDefault()
     if (!form.nome_time || !form.cpf_lider) {
       setToast({ type: 'error', message: 'Nome do time e CPF do líder são obrigatórios.' })
+      return
+    }
+    if (form.cpf_lider.length !== 11) {
+      setToast({ type: 'error', message: 'CPF do líder deve ter exatamente 11 dígitos.' })
       return
     }
     setLoading(true)
@@ -90,7 +95,7 @@ const TeamCreatePage: React.FC = () => {
             <option value="">-- Selecione --</option>
             {users.map(u => (
               <option key={u.cpf_user} value={u.cpf_user}>
-                {u.nome} ({u.cpf_user})
+                {u.nome} ({formatCPF(u.cpf_user)})
               </option>
             ))}
           </select>

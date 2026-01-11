@@ -100,6 +100,13 @@ body {
   font-size: 1.8rem;
 }
 
+.logo-icon-img {
+  width: 1.8rem;
+  height: 1.8rem;
+  object-fit: contain;
+  mix-blend-mode: lighten;
+}
+
 .logo-text-group {
   display: flex;
   flex-direction: column;

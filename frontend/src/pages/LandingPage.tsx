@@ -14,7 +14,7 @@ const LandingPage: React.FC = () => {
     },
     {
       id: 'register-team',
-      title: 'Criar Equipe',
+      title: 'Registrar Equipe',
       icon: '🏢',
       description: 'Configure um novo time',
       action: () => navigate('/teams'),
