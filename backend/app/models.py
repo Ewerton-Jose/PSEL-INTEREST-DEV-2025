@@ -17,6 +17,8 @@ class User(SQLModel, table=True):
     nome: str = Field(max_length=100)
     funcao: str = Field(max_length=100)
     id_time: Optional[int] = Field(default=None, foreign_key="times.id_time")
+    # Flag para indicar se já foi líder (ex-líder)
+    ex_lider: bool = Field(default=False)
     
     # Relacionamento com time
     time: Optional["Time"] = Relationship(

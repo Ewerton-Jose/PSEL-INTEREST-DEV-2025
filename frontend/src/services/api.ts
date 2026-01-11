@@ -8,6 +8,7 @@ export interface User {
   id_time: number | null
   nome_time?: string | null
   is_lider?: boolean
+  is_ex_lider?: boolean
 }
 
 export interface Time {

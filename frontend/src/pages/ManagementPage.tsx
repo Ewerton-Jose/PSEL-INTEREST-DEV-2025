@@ -93,6 +93,7 @@ const ManagementPage: React.FC = () => {
   const handleEditUser = (user: User) => {
     setEditingUser(user.cpf_user)
     setUserForm({ ...user })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleDeleteUser = async (cpf: string) => {

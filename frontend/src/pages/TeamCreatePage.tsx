@@ -93,7 +93,7 @@ const TeamCreatePage: React.FC = () => {
             required
           >
             <option value="">-- Selecione --</option>
-            {users.map(u => (
+            {users.filter(u => !u.is_lider).map(u => (
               <option key={u.cpf_user} value={u.cpf_user}>
                 {u.nome} ({formatCPF(u.cpf_user)})
               </option>

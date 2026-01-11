@@ -93,9 +93,10 @@ def criar_time(time_data: TimeCreate, session: Session = Depends(get_session)):
     session.commit()
     session.refresh(time)
     
-    # Conta membros
+    # Conta membros (incluindo o líder)
     statement = select(User).where(User.id_time == time.id_time)
     membros = session.exec(statement).all()
+    total = len(membros) + 1  # +1 para contar o líder
     
     return TimeResponse(
         id_time=time.id_time,
@@ -103,7 +104,7 @@ def criar_time(time_data: TimeCreate, session: Session = Depends(get_session)):
         responsabilidades=time.responsabilidades,
         cpf_lider=time.cpf_lider,
         lider_nome=lider.nome,
-        total_membros=len(membros)
+        total_membros=total
     )
 
 
@@ -118,6 +119,7 @@ def listar_times(session: Session = Depends(get_session)):
         lider = session.get(User, time.cpf_lider)
         statement = select(User).where(User.id_time == time.id_time)
         membros = session.exec(statement).all()
+        total = len(membros) + 1  # +1 para contar o líder
         
         result.append(TimeResponse(
             id_time=time.id_time,
@@ -125,7 +127,7 @@ def listar_times(session: Session = Depends(get_session)):
             responsabilidades=time.responsabilidades,
             cpf_lider=time.cpf_lider,
             lider_nome=lider.nome if lider else None,
-            total_membros=len(membros)
+            total_membros=total
         ))
     
     return result
@@ -141,6 +143,7 @@ def obter_time(id_time: int, session: Session = Depends(get_session)):
     lider = session.get(User, time.cpf_lider)
     statement = select(User).where(User.id_time == time.id_time)
     membros = session.exec(statement).all()
+    total = len(membros) + 1  # +1 para contar o líder
     
     return TimeResponse(
         id_time=time.id_time,
@@ -148,7 +151,7 @@ def obter_time(id_time: int, session: Session = Depends(get_session)):
         responsabilidades=time.responsabilidades,
         cpf_lider=time.cpf_lider,
         lider_nome=lider.nome if lider else None,
-        total_membros=len(membros)
+        total_membros=total
     )
 
 
@@ -191,6 +194,15 @@ def atualizar_time(id_time: int, time_update: TimeUpdate, session: Session = Dep
                 detail=f"Este usuário já é líder do time '{time_liderado.nome_time}'. "
                        f"Um usuário só pode ser líder de um time."
             )
+        # Marca o antigo líder como ex-líder e o novo líder como não-ex-líder
+        antigo_cpf = time.cpf_lider
+        antigo_lider = session.get(User, antigo_cpf)
+        if antigo_lider:
+            antigo_lider.ex_lider = True
+            session.add(antigo_lider)
+        # O novo líder não deve estar marcado como ex-líder
+        novo_lider.ex_lider = False
+        session.add(novo_lider)
     
     # Atualiza o time
     time.nome_time = time_update.nome_time
@@ -204,6 +216,7 @@ def atualizar_time(id_time: int, time_update: TimeUpdate, session: Session = Dep
     lider = session.get(User, time.cpf_lider)
     statement = select(User).where(User.id_time == time.id_time)
     membros = session.exec(statement).all()
+    total = len(membros) + 1  # +1 para contar o líder
     
     return TimeResponse(
         id_time=time.id_time,
@@ -211,7 +224,7 @@ def atualizar_time(id_time: int, time_update: TimeUpdate, session: Session = Dep
         responsabilidades=time.responsabilidades,
         cpf_lider=time.cpf_lider,
         lider_nome=lider.nome if lider else None,
-        total_membros=len(membros)
+        total_membros=total
     )
 
 
@@ -257,7 +270,8 @@ def listar_membros_do_time(id_time: int, session: Session = Depends(get_session)
             "cpf_user": user.cpf_user,
             "nome": user.nome,
             "funcao": user.funcao,
-            "is_lider": user.cpf_user == time.cpf_lider
+            "is_lider": user.cpf_user == time.cpf_lider,
+            "is_ex_lider": user.ex_lider
         })
     
     return result

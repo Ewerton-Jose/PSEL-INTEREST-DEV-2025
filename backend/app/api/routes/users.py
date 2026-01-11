@@ -37,6 +37,7 @@ class UserResponse(BaseModel):
     id_time: int | None
     nome_time: str | None = None
     is_lider: bool = False
+    is_ex_lider: bool = False
 
 
 @router.post("/", response_model=UserResponse, status_code=201)
@@ -71,12 +72,13 @@ def criar_usuario(user_data: UserCreate, session: Session = Depends(get_session)
     
     # Prepara resposta
     nome_time = None
-    is_lider = False
+    # Líder é determinado por qualquer time que o tenha como cpf_lider
+    is_lider = session.exec(select(Time).where(Time.cpf_lider == user.cpf_user)).first() is not None
+    is_ex_lider = user.ex_lider
     if user.id_time:
         time = session.get(Time, user.id_time)
         if time:
             nome_time = time.nome_time
-            is_lider = time.cpf_lider == user.cpf_user
     
     return UserResponse(
         cpf_user=user.cpf_user,
@@ -84,7 +86,8 @@ def criar_usuario(user_data: UserCreate, session: Session = Depends(get_session)
         funcao=user.funcao,
         id_time=user.id_time,
         nome_time=nome_time,
-        is_lider=is_lider
+        is_lider=is_lider,
+        is_ex_lider=is_ex_lider
     )
 
 
@@ -97,12 +100,13 @@ def listar_usuarios(session: Session = Depends(get_session)):
     result = []
     for user in users:
         nome_time = None
-        is_lider = False
+        # Líder é determinado por qualquer time que o tenha como cpf_lider
+        is_lider = session.exec(select(Time).where(Time.cpf_lider == user.cpf_user)).first() is not None
+        is_ex_lider = user.ex_lider
         if user.id_time:
             time = session.get(Time, user.id_time)
             if time:
                 nome_time = time.nome_time
-                is_lider = time.cpf_lider == user.cpf_user
         
         result.append(UserResponse(
             cpf_user=user.cpf_user,
@@ -110,7 +114,8 @@ def listar_usuarios(session: Session = Depends(get_session)):
             funcao=user.funcao,
             id_time=user.id_time,
             nome_time=nome_time,
-            is_lider=is_lider
+            is_lider=is_lider,
+            is_ex_lider=is_ex_lider
         ))
     
     return result
@@ -124,12 +129,13 @@ def obter_usuario(cpf_user: str, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     
     nome_time = None
-    is_lider = False
+    # Líder é determinado por qualquer time que o tenha como cpf_lider
+    is_lider = session.exec(select(Time).where(Time.cpf_lider == user.cpf_user)).first() is not None
+    is_ex_lider = user.ex_lider
     if user.id_time:
         time = session.get(Time, user.id_time)
         if time:
             nome_time = time.nome_time
-            is_lider = time.cpf_lider == user.cpf_user
     
     return UserResponse(
         cpf_user=user.cpf_user,
@@ -137,7 +143,8 @@ def obter_usuario(cpf_user: str, session: Session = Depends(get_session)):
         funcao=user.funcao,
         id_time=user.id_time,
         nome_time=nome_time,
-        is_lider=is_lider
+        is_lider=is_lider,
+        is_ex_lider=is_ex_lider
     )
 
 
@@ -157,6 +164,16 @@ def atualizar_usuario(cpf_user: str, user_update: UserUpdate, session: Session =
         time = session.get(Time, user_update.id_time)
         if not time:
             raise HTTPException(status_code=404, detail="Time não encontrado")
+        # Não permitir adicionar como membro usuários que são líderes de qualquer equipe
+        time_liderado = session.exec(select(Time).where(Time.cpf_lider == user.cpf_user)).first()
+        if time_liderado is not None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Este usuário é líder do time '{time_liderado.nome_time}'. "
+                    f"Não é permitido adicioná-lo como membro em outra equipe."
+                )
+            )
     
     # Verifica se o usuário é líder do time atual
     if user.id_time:
@@ -180,12 +197,13 @@ def atualizar_usuario(cpf_user: str, user_update: UserUpdate, session: Session =
     session.refresh(user)
     
     nome_time = None
-    is_lider = False
+    # Líder é determinado por qualquer time que o tenha como cpf_lider
+    is_lider = session.exec(select(Time).where(Time.cpf_lider == user.cpf_user)).first() is not None
+    is_ex_lider = user.ex_lider
     if user.id_time:
         time = session.get(Time, user.id_time)
         if time:
             nome_time = time.nome_time
-            is_lider = time.cpf_lider == user.cpf_user
     
     return UserResponse(
         cpf_user=user.cpf_user,
@@ -193,7 +211,8 @@ def atualizar_usuario(cpf_user: str, user_update: UserUpdate, session: Session =
         funcao=user.funcao,
         id_time=user.id_time,
         nome_time=nome_time,
-        is_lider=is_lider
+        is_lider=is_lider,
+        is_ex_lider=is_ex_lider
     )
 
 
@@ -241,7 +260,8 @@ def listar_lideres(session: Session = Depends(get_session)):
                 funcao=user.funcao,
                 id_time=user.id_time,
                 nome_time=time.nome_time,
-                is_lider=True
+                is_lider=True,
+                is_ex_lider=user.ex_lider
             ))
     
     return result

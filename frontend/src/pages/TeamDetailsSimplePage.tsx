@@ -66,6 +66,8 @@ const TeamDetailsSimplePage: React.FC = () => {
               <li key={member.cpf_user} className="member-item">
                 {member.cpf_user === team.cpf_lider ? (
                   <strong>👑 {member.nome}</strong>
+                ) : member.is_ex_lider ? (
+                  <span>🕑 {member.nome} (EX-líder)</span>
                 ) : (
                   <span>{member.nome}</span>
                 )}

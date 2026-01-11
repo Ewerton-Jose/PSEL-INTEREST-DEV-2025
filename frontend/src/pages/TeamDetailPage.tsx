@@ -159,7 +159,17 @@ const TeamDetailPage: React.FC = () => {
       <div className="grid-2">
         {/* Informações do Time */}
         <section className="card">
-          <h2>Informações do Time</h2>
+          <div className="card-header">
+            <h2>Informações do Time</h2>
+            <div className="actions">
+              <button className="ghost" onClick={() => setEditMode(!editMode)}>
+                {editMode ? 'Cancelar' : 'Editar'}
+              </button>
+              <button className="danger" onClick={handleDeleteTeam}>
+                Deletar Time
+              </button>
+            </div>
+          </div>
           <div className="info-block">
             <div className="info-item">
               <label>Líder</label>
@@ -235,7 +245,7 @@ const TeamDetailPage: React.FC = () => {
                   onChange={e => setSelectedUser(e.target.value)}
                 >
                   <option value="">-- Selecione --</option>
-                  {availableUsers.map(user => (
+                  {availableUsers.filter(user => !user.is_lider).map(user => (
                     <option key={user.cpf_user} value={user.cpf_user}>
                       {user.nome} ({formatCPF(user.cpf_user)})
                     </option>
@@ -256,9 +266,9 @@ const TeamDetailPage: React.FC = () => {
 
       {/* Lista de Membros */}
       <section className="card members-section">
-        <h2>Membros do Time ({members.length})</h2>
+        <h2>Membros do Time ({members.length + (members.some(m => m.cpf_user === team?.cpf_lider) ? 0 : 1)})</h2>
         {members.length === 0 ? (
-          <p className="empty-message">Nenhum membro adicionado ainda</p>
+          <p className="empty-message">Apenas o líder no time</p>
         ) : (
           <div className="members-list">
             {members.map(member => (
@@ -269,6 +279,9 @@ const TeamDetailPage: React.FC = () => {
                     <span className="cpf">CPF: {formatCPF(member.cpf_user)}</span>
                     <span className="funcao">{member.funcao}</span>
                     {member.is_lider && <span className="badge-leader">Líder</span>}
+                    {member.is_ex_lider && !member.is_lider && (
+                      <span className="badge-ex-leader">EX-líder</span>
+                    )}
                   </div>
                 </div>
                 {!member.is_lider && (

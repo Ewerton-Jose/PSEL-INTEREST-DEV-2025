@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { formatCPF } from '../utils/cpfMask'
-import { listTimes, Time } from '../services/api'
+import { listTimes, Time, deleteTime } from '../services/api'
+
+interface Toast {
+  type: 'success' | 'error'
+  message: string
+}
 
 const TeamsPage: React.FC = () => {
   const navigate = useNavigate()
   const [times, setTimes] = useState<Time[]>([])
   const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<Toast | null>(null)
 
   const loadTimes = async () => {
     setLoading(true)
@@ -17,6 +23,18 @@ const TeamsPage: React.FC = () => {
       console.error('Erro ao carregar times:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteTeam = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!confirm('Deseja realmente excluir este time?')) return
+    try {
+      await deleteTime(id)
+      setTimes(prev => prev.filter(t => t.id_time !== id))
+      setToast({ type: 'success', message: 'Time excluído com sucesso' })
+    } catch (err) {
+      setToast({ type: 'error', message: (err as Error).message })
     }
   }
 
@@ -37,6 +55,12 @@ const TeamsPage: React.FC = () => {
         {loading && <span className="badge">Atualizando...</span>}
       </div>
 
+      {toast && (
+        <div className={`toast ${toast.type}`} onClick={() => setToast(null)}>
+          {toast.message}
+        </div>
+      )}
+
       <div className="teams-grid">
         {times.length === 0 ? (
           <div className="empty-state">
@@ -54,6 +78,25 @@ const TeamsPage: React.FC = () => {
               <div className="team-card-header">
                 <div className="team-icon">🏆</div>
                 <h3 className="team-name">{time.nome_time}</h3>
+                <div className="team-actions">
+                  <button 
+                    className="btn-icon edit"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/team/${time.id_time}`)
+                    }}
+                    title="Editar"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    className="btn-icon delete"
+                    onClick={(e) => handleDeleteTeam(time.id_time, e)}
+                    title="Deletar"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
 
               <div className="team-details">
