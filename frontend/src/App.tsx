@@ -6,7 +6,9 @@ import QuestPage from './pages/QuestPage'
 import ManagementPage from './pages/ManagementPage'
 import TeamsPage from './pages/TeamsPage'
 import TeamDetailPage from './pages/TeamDetailPage'
+import TeamDetailsSimplePage from './pages/TeamDetailsSimplePage'
 import TeamCreatePage from './pages/TeamCreatePage'
+import AllTeamsPage from './pages/AllTeamsPage'
 import './App.css'
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
             <Route path="teams" element={<TeamsPage />} />
             <Route path="teams/new" element={<TeamCreatePage />} />
             <Route path="team/:id" element={<TeamDetailPage />} />
+            <Route path="team-simple/:id" element={<TeamDetailsSimplePage />} />
+            <Route path="all-teams" element={<AllTeamsPage />} />
           </Route>
         </Routes>
       </Router>

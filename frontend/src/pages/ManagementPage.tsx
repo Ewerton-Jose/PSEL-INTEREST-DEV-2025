@@ -21,6 +21,7 @@ const ManagementPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
+  const [validationError, setValidationError] = useState<string | null>(null)
 
   const loadUsers = async () => {
     setLoading(true)
@@ -40,6 +41,10 @@ const ManagementPage: React.FC = () => {
 
   const handleUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (/\d/.test(userForm.nome)) {
+      setValidationError('Sem números em nome')
+      return
+    }
     try {
       if (editingUser) {
         const updated = await updateUser(editingUser, {
@@ -62,6 +67,7 @@ const ManagementPage: React.FC = () => {
       setUserForm(emptyUser)
       setEditingUser(null)
       loadUsers()
+      setValidationError(null)
     } catch (err) {
       setToast({ type: 'error', message: (err as Error).message })
     }
@@ -116,7 +122,10 @@ const ManagementPage: React.FC = () => {
           <form className="form" onSubmit={handleUserSubmit}>
             {!editingUser && (
               <label>
-                CPF
+                <div className="field-header">
+                  <span>CPF</span>
+                  <span className="field-hint">Obrigatório</span>
+                </div>
                 <input
                   value={userForm.cpf_user}
                   onChange={e => setUserForm(prev => ({ ...prev, cpf_user: e.target.value }))}
@@ -129,12 +138,19 @@ const ManagementPage: React.FC = () => {
               Nome
               <input
                 value={userForm.nome}
-                onChange={e => setUserForm(prev => ({ ...prev, nome: e.target.value }))}
+                onChange={e => {
+                  setValidationError(null)
+                  setUserForm(prev => ({ ...prev, nome: e.target.value }))
+                }}
                 required
               />
+              {validationError && <span className="error-text">{validationError}</span>}
             </label>
             <label>
-              Função
+              <div className="field-header">
+                <span>Função</span>
+                <span className="field-hint">Obrigatório</span>
+              </div>
               <input
                 value={userForm.funcao}
                 onChange={e => setUserForm(prev => ({ ...prev, funcao: e.target.value }))}

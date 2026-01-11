@@ -2,6 +2,7 @@
   --orange-primary: #FF8C42;
   --orange-light: #FFA45C;
   --orange-dark: #FF6F20;
+  --error-color: #ff4d4f;
   --bg-dark: #0a0e27;
   --bg-card: rgba(255, 140, 66, 0.08);
   --text-primary: #ffffff;
@@ -231,6 +232,17 @@ body {
   flex: 1;
 }
 
+/* Generic toast styles */
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.toast.success { background: rgba(0, 200, 120, 0.15); border: 1px solid #00c878; }
+.toast.error { background: rgba(255, 77, 79, 0.15); border: 1px solid var(--error-color); color: var(--error-color); }
+
 /* Management page */
 .manage-page .page-header {
   margin-bottom: 1.5rem;
@@ -257,7 +269,7 @@ body {
 }
 
 .manage-page .toast.success { background: rgba(0, 200, 120, 0.15); border: 1px solid #00c878; }
-.manage-page .toast.error { background: rgba(255, 99, 71, 0.15); border: 1px solid #ff6347; }
+.manage-page .toast.error { background: rgba(255, 77, 79, 0.15); border: 1px solid var(--error-color); color: var(--error-color); }
 
 .grid-2 {
   display: grid;
@@ -294,6 +306,19 @@ body {
   color: var(--text-secondary);
 }
 
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
 .form input,
 .form textarea,
 .form select {
@@ -307,6 +332,11 @@ body {
 .form textarea {
   min-height: 80px;
   resize: vertical;
+}
+
+.error-text {
+  color: var(--error-color);
+  font-size: 0.9rem;
 }
 
 .primary,
@@ -379,6 +409,7 @@ body {
 .error-container {
   text-align: center;
   padding: 4rem;
+  color: var(--error-color);
 }
 
 /* Quest Grid Styles */
@@ -1383,4 +1414,131 @@ body {
   color: var(--orange-primary);
   font-weight: 700;
   margin-right: 0.5rem;
+}
+/* Simple Team Details Page */
+.simple-team-details {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.simple-header {
+  margin-bottom: 2rem;
+}
+
+.simple-content h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.members-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.simple-members-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 140, 66, 0.08);
+  border: 1px solid rgba(255, 140, 66, 0.2);
+  border-radius: 12px;
+}
+
+.simple-members-list .member-item {
+  padding: 0.75rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.simple-members-list .member-item strong {
+  font-weight: 700;
+}
+
+.simple-members-list .empty-message {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* All Teams Page */
+.all-teams-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.all-teams-header {
+  margin-bottom: 3rem;
+}
+
+.all-teams-header h1 {
+  font-size: 2.5rem;
+  margin-top: 1rem;
+  color: var(--text-primary);
+}
+
+.all-teams-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.team-group {
+  background: rgba(255, 140, 66, 0.08);
+  border: 1px solid rgba(255, 140, 66, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.team-group-title {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.member-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.member-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.member-cpf {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.member-role {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.no-members {
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 0.75rem 0;
 }

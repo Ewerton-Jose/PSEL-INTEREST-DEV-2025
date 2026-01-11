@@ -21,17 +21,10 @@ const LandingPage: React.FC = () => {
     },
     {
       id: 'team-details',
-      title: 'Detalhes de Equipe',
+      title: 'Todas equipes',
       icon: '📊',
-      description: 'Visualize times e membros',
-      action: () => navigate('/teams'),
-    },
-    {
-      id: 'analytics',
-      title: 'Gerenciar',
-      icon: '⚙️',
-      description: 'Gerencie usuários e equipes',
-      action: () => navigate('/manage'),
+      description: 'Visualize todas as equipes e membros',
+      action: () => navigate('/all-teams'),
     },
   ]
 
@@ -63,17 +56,6 @@ const LandingPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="info-section">
-        <div className="info-card">
-          <h4>💡 Dicas</h4>
-          <ul>
-            <li>Todo time necessita de um líder</li>
-            <li>Cada usuário pode pertencer a apenas um time</li>
-            <li>Não é possível remover um líder ativo</li>
-            <li>Use o menu lateral para navegar entre times</li>
-          </ul>
-        </div>
-      </div>
     </div>
   )
 }

@@ -48,7 +48,7 @@ const TeamsPage: React.FC = () => {
             <div
               key={time.id_time}
               className="team-card"
-              onClick={() => navigate(`/team/${time.id_time}`)}
+              onClick={() => navigate(`/team-simple/${time.id_time}`)}
             >
               <div className="team-card-header">
                 <div className="team-icon">🏆</div>
