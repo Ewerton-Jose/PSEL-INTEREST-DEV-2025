@@ -120,7 +120,8 @@ body {
 
 .header-nav {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .nav-link {
@@ -857,6 +858,11 @@ body {
   position: relative;
 }
 
+.sidebar-shell {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .sidebar {
   width: 280px;
   background: rgba(255, 255, 255, 0.04);
@@ -867,6 +873,75 @@ body {
   height: fit-content;
   position: sticky;
   top: 100px;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.layout-with-sidebar.sidebar-hidden .sidebar {
+  display: none;
+}
+
+.layout-with-sidebar.sidebar-hidden .main-content {
+  margin-left: 0;
+}
+
+.sidebar-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-edge-toggle {
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  padding: 0.45rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.layout-with-sidebar:not(.sidebar-hidden) .sidebar-edge-toggle {
+  left: 302px;
+}
+
+.sidebar-toggle.icon-only {
+  padding: 0.4rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.sidebar-toggle-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.sidebar-toggle:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 .sidebar-header {
@@ -1073,26 +1148,34 @@ body {
 
 /* Responsive Sidebar */
 @media (max-width: 1024px) {
-  .sidebar {
-    width: 240px;
-    padding: 1rem;
+  .sidebar { width: 240px; padding: 1rem; }
+
+  .layout-with-sidebar:not(.sidebar-hidden) .sidebar-edge-toggle {
+    left: 262px;
   }
 
   .sidebar-link-text {
     font-size: 0.85rem;
   }
 }
-
 @media (max-width: 768px) {
   .layout-with-sidebar {
-    flex-direction: column-reverse;
-    gap: 1rem;
+    flex-direction: column;
   }
 
   .sidebar {
     width: 100%;
     position: static;
-    height: auto;
+  }
+
+  .sidebar-edge-toggle {
+    top: 80px;
+    left: 10px;
+  }
+
+  .layout-with-sidebar:not(.sidebar-hidden) .sidebar-edge-toggle {
+    left: 10px;
+    top: 10px;
   }
 
   .actions-grid {
